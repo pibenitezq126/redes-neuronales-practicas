@@ -4,11 +4,14 @@ Repositorio personal para el desarrollo de prácticas, tareas y soluciones del c
 
 ---
 
-## 📌 Guía de Tarea - Clase 2 (10 Puntos)
+## 📌 Guías de Tareas por Clase
 
-Toda la explicación teórica, fórmulas y soluciones paso a paso de los cuadernos evaluados están documentadas en:
+### Clase 3: Red Neuronal Simple y Activaciones (3 Puntos)
+👉 **[`docs/SESION_CLASE3_TAREA.md`](docs/SESION_CLASE3_TAREA.md)**
+* **1_04_red_neuronal_simple.ipynb** (3 pts): Función de activación sigmoide con `np.exp(-h)`, clase `Neurona` orientada a objetos (combinación lineal + forward), y función tangente hiperbólica (`tanh`) con comparativa teórica/gráfica frente a la sigmoide.
+
+### Clase 2: El Perceptrón (10 Puntos)
 👉 **[`docs/SESION_CLASE2_TAREA.md`](docs/SESION_CLASE2_TAREA.md)**
-
 * **1_01_mcculloch_pitts.ipynb** (3 pts): Implementación de la neurona de McCulloch-Pitts con entradas excitatorias, inhibitorias y umbral.
 * **1_03_1_perceptron_simple.ipynb** (3 pts): Combinación lineal manual (sin `np.dot`), función escalón y pesos de compuerta OR.
 * **1_03_2_regla_de_aprendizaje.ipynb** (4 pts): Inicialización normal, pérdida SAE, regla de actualización de Rosenblatt y calibración de épocas (20-50).
@@ -55,6 +58,7 @@ jupyter-lab notebooks/
 
 | Carpeta / archivo | Qué contiene |
 |---|---|
+| [`docs/SESION_CLASE3_TAREA.md`](docs/SESION_CLASE3_TAREA.md) | **Guía completa y soluciones de la asignación Clase 3** |
 | [`docs/SESION_CLASE2_TAREA.md`](docs/SESION_CLASE2_TAREA.md) | **Guía completa y soluciones de la asignación Clase 2** |
 | [`docs/GUIA_PASO_A_PASO_CLASE1.md`](docs/GUIA_PASO_A_PASO_CLASE1.md) | Clase 1 desde cero: instalación paso a paso y explicación teórica |
 | [`docs/02_Principios.md`](docs/02_Principios.md) | Módulo 2: McCulloch-Pitts y perceptrón |
