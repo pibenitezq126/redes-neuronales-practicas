@@ -1,12 +1,40 @@
-# Guía paso a paso — Clase 1: Introducción a las Redes Neuronales
+# Guía paso a paso — Clase 1: El proyecto y los datos
 
-Esta guía explica **todo** lo que aparece en las 16 diapositivas, desde cero, como si nunca hubieras visto el tema. Tiene tres partes:
+**El proyecto del curso:** construir desde cero, en Python y NumPy, una red neuronal que **reconoce números escritos a mano**. En la última clase cada alumno dibuja un número con el mouse y su propia red lo adivina.
+**Pieza de hoy:** instalar todo, conocer los 70 000 dígitos de MNIST y armar una primera «IA» que acierta el 82 % sin una sola neurona.
+**Duración:** ~2 h de clase, más 15–30 min de margen para dudas
+**Material:** diapositivas `Clase1_Diapositivas` · notebook `proyecto/P1_conocer_los_datos.ipynb` · repositorio https://github.com/datahuba/curso-redes-neuronales
 
-- **Parte A:** preparar las computadoras ANTES de clase (instalación rigurosa, con verificación en cada paso).
-- **Parte B:** qué explicar en cada diapositiva, con definiciones sencillas y ejemplos.
-- **Parte C:** problemas frecuentes y cómo resolverlos.
+**Cómo es el curso desde ahora:** directo a la práctica. Cada clase arranca con el notebook abierto y la teoría entra en pausas cortas, justo cuando el ejercicio la necesita. Cada clase termina con algo que corre y una precisión medida.
 
-Diapositivas: https://claude.ai/artifact/9vRb7zDTg2JWdN1B1YQL4j
+La guía tiene tres partes:
+- **Parte A:** preparar las computadoras **antes** de clase (instalación rigurosa, con verificación en cada paso).
+- **Parte B:** la clase paso a paso: pasos de práctica y pausas cortas de teoría.
+- **Parte C:** problemas frecuentes.
+
+## Objetivos de la clase
+
+Al terminar, cada alumno podrá:
+1. Explicar qué vamos a construir en el curso y en qué se diferencia «programar reglas» de «aprender de datos».
+2. Cargar MNIST, ver que una imagen es una tabla de números y prepararla (aplanar y normalizar).
+3. Construir un clasificador por plantillas y medir su **precisión** con datos de prueba.
+
+## Agenda
+
+> **Cómo se da esta clase:** directo a la práctica. Los alumnos abren el notebook en el minuto 2 y la teoría entra en **pausas cortas** (⏸) justo cuando el ejercicio la necesita. Regla de oro: **primero lo hacen, después lo explicas** (o, si hace falta para poder hacerlo, lo explicas en 3–5 minutos y vuelven al teclado). Las diapositivas siguen el mismo orden: «Paso» (oscuras) = trabajan; «Pausa · teoría» (claras) = explicas.
+
+| Tiempo | Qué pasa |
+|---|---|
+| 0:00 | Demo: dibujan un número y la red lo adivina (2 min) |
+| 0:02 | **Paso 1** · Instalar (40 min) |
+| 0:42 | **Paso 2** · Abrir el proyecto `P1` (5 min) |
+| 0:47 | **Paso 3** · Mirar los datos (15 min) |
+| 1:02 | ⏸ Pausa: una imagen es una tabla de números (3 min) |
+| 1:05 | **Paso 4** · Preparar los datos (10 min) |
+| 1:15 | Descanso (10 min) |
+| 1:25 | ⏸ Pausa: reglas vs ejemplos, plantillas (3 min) |
+| 1:28 | **Paso 5** · La IA de plantillas y el examen (30 min) |
+| 1:58 | Resultado (82 %), mapa del proyecto y cierre (15 min) |
 
 ---
 
@@ -21,7 +49,7 @@ Diapositivas: https://claude.ai/artifact/9vRb7zDTg2JWdN1B1YQL4j
 | **Anaconda / conda** | Programa que instala Python y administra "ambientes". |
 | **Ambiente** | Una "caja" aislada con su propia versión de Python y sus paquetes. Así un proyecto no rompe a otro. El nuestro se llamará `nni` (*neural network introduction*). |
 | **pip** | El instalador de paquetes de Python. |
-| **Terminal** | Ventana donde se escriben comandos de texto. Usaremos **Anaconda PowerShell Prompt** y **Git Bash**. |
+| **Terminal** | Ventana donde se escriben comandos de texto. Usaremos **Anaconda PowerShell Prompt**. |
 | **Git** | Programa para descargar y versionar código. |
 | **GitHub** | Sitio web donde se guarda código. Allí está el repositorio del curso. |
 | **Repositorio (repo)** | Carpeta de un proyecto con todos sus archivos. |
@@ -46,15 +74,10 @@ Recomendación: prepara el **Camino 2** en tu computadora y ten listo el **Camin
 
 ## A.2 Camino 1 — Google Colab (sin instalar nada)
 
-1. Abre el navegador y entra a: https://github.com/datahuba/curso-redes-neuronales y abre la carpeta `notebooks`
-2. Haz clic en un notebook, por ejemplo `1_01_mcculloch_pitts.ipynb`.
-3. Si aparece el botón **"Open in Colab"**, haz clic. Si no aparece:
-   1. Entra a https://colab.research.google.com
-   2. Menú **Archivo → Abrir cuaderno**.
-   3. Elige la pestaña **GitHub**.
-   4. Pega `datahuba/curso-redes-neuronales` y presiona Enter.
-   5. Elige el notebook.
-4. Inicia sesión con tu cuenta de Google si lo pide.
+1. Entra a https://colab.research.google.com e inicia sesión con tu cuenta de Google.
+2. Menú **Archivo → Abrir cuaderno** → pestaña **GitHub**.
+3. Pega `datahuba/curso-redes-neuronales` y presiona Enter.
+4. Elige el notebook, por ejemplo `proyecto/P1_conocer_los_datos.ipynb`.
 5. Haz clic en la primera celda de código y presiona **Shift + Enter** para ejecutarla.
 6. Para guardar tus cambios: **Archivo → Guardar una copia en Drive**. Si no lo haces, se pierden.
 
@@ -67,7 +90,9 @@ print(np.__version__)
 
 Si aparece un número de versión (por ejemplo `1.26.4`), Colab funciona.
 
-**Notebooks que usan la carpeta `nni`** (como `1_03_2`): en Colab necesitan el repositorio completo. Ejecuta en la primera celda:
+**Los notebooks del proyecto** (`proyecto/P1` … `P7`) funcionan en Colab tal cual: su primera celda descarga sola las herramientas (`digitos.py`) y los datos.
+
+**Los notebooks de apoyo** de la carpeta `notebooks/` que usan la carpeta `nni` o archivos de datos (como `1_03_2`) necesitan el repositorio completo. Ejecuta esto en la primera celda:
 
 ```python
 !git clone https://github.com/datahuba/curso-redes-neuronales
@@ -78,12 +103,14 @@ Si aparece un número de versión (por ejemplo `1.26.4`), Colab funciona.
 
 ## A.3 Camino 2 — Instalación local en Windows
 
-Sigue los pasos **en orden**. En total son 7.
+Son **7 pasos**, en este orden:
+- Pasos 1 a 3: instalar tres programas, con clics.
+- Pasos 4 a 7: escribir comandos en **una sola** terminal, Anaconda PowerShell Prompt.
 
 ### Paso 1. Instalar Anaconda
 
 1. Entra a https://www.anaconda.com/download
-2. Descarga el instalador para **Windows**, el botón de 64 bits.
+2. Descarga el instalador para **Windows** (64 bits).
 3. Ejecuta el archivo descargado (`Anaconda3-...-Windows-x86_64.exe`).
 4. En el instalador:
    - **Next → I Agree**.
@@ -93,7 +120,7 @@ Sigue los pasos **en orden**. En total son 7.
    - **Install** y espera de 5 a 15 minutos → **Finish**.
 
 **Verificación:**
-1. Abre el menú Inicio y escribe `Anaconda PowerShell Prompt`. Ábrelo.
+1. Abre el menú Inicio, escribe `Anaconda PowerShell Prompt` y ábrelo.
 2. Debe verse una línea que empieza con `(base)`, por ejemplo:
    ```
    (base) PS C:\Users\TuUsuario>
@@ -104,11 +131,36 @@ Sigue los pasos **en orden**. En total son 7.
    ```
    Debe responder algo como `conda 24.x.x`.
 
-> Nota del curso: Anaconda tiene una interfaz gráfica (Anaconda Navigator), pero es lenta. Usaremos la terminal.
+> Anaconda tiene una interfaz gráfica (Anaconda Navigator), pero es lenta. Usaremos la terminal.
 
-### Paso 2. Crear el ambiente `nni`
+### Paso 2. Instalar Git for Windows
 
-En la misma ventana de **Anaconda PowerShell Prompt** escribe:
+1. Entra a https://git-scm.com/download/win
+2. Descarga **64-bit Git for Windows Setup** y ejecútalo.
+3. Acepta todas las opciones por defecto (**Next** en todo) → **Install** → **Finish**.
+
+**Verificación:** **cierra y vuelve a abrir** Anaconda PowerShell Prompt (así reconoce el programa nuevo) y escribe:
+
+```bash
+git --version
+```
+
+Debe responder algo como `git version 2.4x.x.windows.1`.
+
+### Paso 3. Instalar VS Code y sus extensiones
+
+1. Entra a https://code.visualstudio.com, descarga e instala con las opciones por defecto. Marca **"Agregar a PATH"** si aparece.
+2. Abre VS Code.
+3. Instala dos extensiones:
+   1. Haz clic en el ícono de **Extensiones** de la barra izquierda (cuatro cuadritos) o presiona `Ctrl + Shift + X`.
+   2. Busca **Python** (de Microsoft) → **Install**.
+   3. Busca **Jupyter** (de Microsoft) → **Install**.
+
+**Verificación:** en la barra izquierda, dentro de Extensiones, aparecen **Python** y **Jupyter** como instaladas.
+
+### Paso 4. Crear y activar el ambiente `nni`
+
+En **Anaconda PowerShell Prompt** escribe:
 
 ```bash
 conda create --name nni python=3.11
@@ -117,19 +169,11 @@ conda create --name nni python=3.11
 Qué significa:
 - `conda create` → crea un ambiente nuevo.
 - `--name nni` → le pone de nombre `nni`.
-- `python=3.11` → le instala Python 3.11.
+- `python=3.11` → le instala Python 3.11. En el video se usa `python=3`; 3.11 es una versión 3 concreta y estable.
 
-En el video se usa `python=3`; 3.11 es una versión 3 concreta y estable que funciona con todos los paquetes.
+Cuando pregunte `Proceed ([y]/n)?`, escribe `y` y presiona Enter. Tarda de 1 a 3 minutos.
 
-Cuando pregunte `Proceed ([y]/n)?`, escribe `y` y presiona Enter. Descargará e instalará; tarda de 1 a 3 minutos.
-
-**Verificación:**
-```bash
-conda env list
-```
-Debe aparecer una línea con `nni` y su ruta.
-
-### Paso 3. Activar el ambiente
+Luego actívalo:
 
 ```bash
 conda activate nni
@@ -142,15 +186,48 @@ conda activate nni
 
 ⚠️ **Cada vez que abras una terminal nueva**, el ambiente vuelve a `(base)`. Debes repetir `conda activate nni`.
 
-### Paso 4. Instalar los paquetes
+### Paso 5. Descargar (clonar) el repositorio del curso
 
-Con `(nni)` visible, escribe (es **una sola línea**):
+En la misma terminal, con `(nni)` visible:
 
 ```bash
-pip install jupyter numpy pandas matplotlib scikit-learn pillow ipykernel
+cd ~
+```
+```bash
+mkdir projects
+```
+```bash
+cd projects
+```
+```bash
+git clone https://github.com/datahuba/curso-redes-neuronales.git
+```
+```bash
+cd curso-redes-neuronales
 ```
 
-Para qué sirve cada uno:
+Qué significa:
+- `cd ~` → ir a tu carpeta de usuario.
+- `mkdir projects` → crear una carpeta `projects`. Si ya existía, muestra un error en rojo; no pasa nada, continúa.
+- `cd projects` → entrar a esa carpeta.
+- `git clone <url>` → descargar una copia del repositorio.
+- `cd curso-redes-neuronales` → entrar a la carpeta del curso.
+
+**Verificación:** escribe `ls`. Deben aparecer `docs`, `notebooks`, `README.md` y `requirements.txt`.
+
+> **Alternativa sin Git:** en GitHub, botón verde **Code → Download ZIP**. Descomprímelo en `C:\Users\TuUsuario\projects` y entra a esa carpeta con `cd`.
+>
+> En el video se usa la terminal **Git Bash** para clonar; también funciona, pero así usamos una sola ventana para todo.
+
+### Paso 6. Instalar los paquetes
+
+Dentro de la carpeta `curso-redes-neuronales`, con `(nni)` activo:
+
+```bash
+pip install -r requirements.txt
+```
+
+`-r requirements.txt` le dice a pip que instale **la lista de paquetes del curso**, que viene en ese archivo:
 
 | Paquete | Para qué |
 |---|---|
@@ -162,83 +239,25 @@ Para qué sirve cada uno:
 | `pillow` | Abrir imágenes |
 | `ipykernel` | Que VS Code reconozca el ambiente como kernel |
 
-Espera a que termine; tarda de 2 a 5 minutos. La última línea debe decir `Successfully installed ...`.
+Tarda de 2 a 5 minutos. La última línea debe decir `Successfully installed ...`.
 
-**Verificación:** copia y ejecuta esta línea:
+**Verificación:**
 
 ```bash
 python -c "import numpy, pandas, matplotlib, sklearn, PIL; print('TODO OK')"
 ```
 
-Debe imprimir `TODO OK`. Si dice `ModuleNotFoundError`, revisa que estés en `(nni)` y repite el Paso 4.
+Debe imprimir `TODO OK`. Si dice `ModuleNotFoundError`, revisa que estés en `(nni)` y repite el Paso 6.
 
-### Paso 5. Instalar Git for Windows
+### Paso 7. Abrir los notebooks en VS Code (verificación final)
 
-1. Entra a https://git-scm.com/download/win
-2. Descarga **64-bit Git for Windows Setup** y ejecútalo.
-3. Acepta todas las opciones por defecto (**Next** en todo) → **Install** → **Finish**.
-
-**Verificación:**
-1. Menú Inicio → escribe `Git Bash` → ábrelo. Es una ventana negra con texto de colores.
-2. Escribe:
-   ```bash
-   git --version
-   ```
-   Debe responder algo como `git version 2.4x.x.windows.1`.
-
-### Paso 6. Clonar el repositorio del curso
-
-En **Git Bash**:
-
-1. Ve a tu carpeta de usuario y crea una carpeta para tus proyectos:
-   ```bash
-   cd ~
-   ```
-   ```bash
-   mkdir -p projects
-   ```
-   ```bash
-   cd projects
-   ```
-   - `cd` = cambiar de carpeta.
-   - `~` = tu carpeta de usuario.
-   - `mkdir -p` = crear la carpeta; si ya existe, no hace nada.
-2. Clona el repositorio:
-   ```bash
-   git clone https://github.com/datahuba/curso-redes-neuronales.git
-   ```
-   El enlace también se puede copiar desde GitHub: botón verde **Code → copiar**.
-3. Entra a la carpeta y lista su contenido:
-   ```bash
-   cd curso-redes-neuronales
-   ```
-   ```bash
-   ls
-   ```
-
-**Verificación:** `ls` debe mostrar las carpetas `notebooks` y `docs` y el archivo `README.md`.
-
-> Si ya existía la carpeta, Git dirá `destination path ... already exists`. No es un error grave: ya lo tienes clonado.
->
-> **Alternativa sin Git:** en GitHub, botón verde **Code → Download ZIP**. Luego descomprímelo en `C:\Users\TuUsuario\projects`.
-
-### Paso 7. Instalar VS Code y abrir los notebooks
-
-1. Entra a https://code.visualstudio.com, descarga e instala con las opciones por defecto. Marca **"Agregar a PATH"** si aparece.
-2. Abre VS Code.
-3. Instala dos extensiones:
-   1. Haz clic en el ícono de **Extensiones** de la barra izquierda (cuatro cuadritos) o presiona `Ctrl + Shift + X`.
-   2. Busca **Python** (de Microsoft) → **Install**.
-   3. Busca **Jupyter** (de Microsoft) → **Install**.
-4. **File → Open Folder…** (Archivo → Abrir carpeta) → elige `C:\Users\TuUsuario\projects\curso-redes-neuronales\notebooks` → **Seleccionar carpeta**. Si pregunta si confías en los autores, elige **Yes, I trust**.
-5. En el panel izquierdo haz clic en `1_01_mcculloch_pitts.ipynb`.
-6. **Elegir el kernel (muy importante):**
-   1. Arriba a la derecha haz clic en **Select Kernel**.
+1. En VS Code: **File → Open Folder…** (Archivo → Abrir carpeta) → elige `C:\Users\TuUsuario\projects\curso-redes-neuronales` → **Seleccionar carpeta**. Si pregunta si confías en los autores, elige **Yes, I trust**.
+2. En el panel izquierdo abre `proyecto` → `P1_conocer_los_datos.ipynb`.
+3. **Elige el kernel (muy importante):**
+   1. Arriba a la derecha, haz clic en **Select Kernel**.
    2. Elige **Python Environments…**.
    3. Elige el que diga **nni**, por ejemplo `nni (Python 3.11.x)`.
-7. Haz clic en la primera celda de código y presiona **Shift + Enter**.
-
-**Verificación final:** crea una celda (botón **+ Code**), escribe esto y ejecútalo con Shift + Enter:
+4. Crea una celda (botón **+ Code**), escribe esto y ejecútalo con **Shift + Enter**:
 
 ```python
 import sys, numpy as np
@@ -246,14 +265,16 @@ print(sys.executable)
 print(np.__version__)
 ```
 
-- La primera línea debe contener `envs\nni` (prueba de que usas el ambiente correcto).
+**Verificación final:**
+- La primera línea debe contener `envs\nni`; eso prueba que usas el ambiente correcto.
 - La segunda debe ser un número de versión.
 
-✅ Si ves ambas cosas, **la computadora está lista**.
+✅ Si ves ambas cosas, **la computadora está lista**. Borra la celda de prueba.
 
 ### Resumen de comandos (para copiar)
 
-**Anaconda PowerShell Prompt:**
+Todo en **Anaconda PowerShell Prompt**:
+
 ```bash
 conda create --name nni python=3.11
 ```
@@ -261,222 +282,99 @@ conda create --name nni python=3.11
 conda activate nni
 ```
 ```bash
-pip install jupyter numpy pandas matplotlib scikit-learn pillow ipykernel
+cd ~
 ```
 ```bash
-python -c "import numpy, pandas, matplotlib, sklearn, PIL; print('TODO OK')"
+mkdir projects
 ```
-
-**Git Bash:**
 ```bash
-cd ~ && mkdir -p projects && cd projects
+cd projects
 ```
 ```bash
 git clone https://github.com/datahuba/curso-redes-neuronales.git
 ```
-
-**Alternativa sin VS Code** (desde Anaconda PowerShell con `(nni)` activo):
 ```bash
-cd ~\projects\curso-redes-neuronales\notebooks
+cd curso-redes-neuronales
 ```
+```bash
+pip install -r requirements.txt
+```
+
+**Alternativa sin VS Code:** con `(nni)` activo, dentro de `curso-redes-neuronales`:
+
 ```bash
 jupyter notebook
 ```
-Se abre el navegador con la lista de notebooks. Para cerrarlo, en la terminal presiona `Ctrl + C`.
+
+Se abre el navegador con la lista de archivos. Para cerrarlo, en la terminal presiona `Ctrl + C`.
 
 ---
 
 ## A.4 Checklist del día de la clase
 
-- [ ] Tu computadora pasó la **Verificación final** del Paso 7.
+- [ ] Tu computadora pasó la **verificación final** del Paso 7.
 - [ ] Probaste abrir un notebook en **Colab** (plan B).
 - [ ] Tienes abiertas las diapositivas.
+- [ ] Preparaste la demo de `dibujar.py` (A.5).
 - [ ] Llegaste 15 minutos antes para probar el proyector.
-- [ ] Si los alumnos instalarán en clase: avísales que traigan laptop con **5 GB libres** y permisos de administrador. Si pueden, que descarguen Anaconda en casa, porque son unos 900 MB.
+- [ ] Si los alumnos instalarán en clase, avísales que traigan laptop con **5 GB libres** y permisos de administrador. Si pueden, que descarguen Anaconda en casa: son unos 900 MB.
+
+
+## A.5 Preparar la demo (docente, 10 min)
+
+La clase empieza mostrando el **final** del curso. Hazlo la noche anterior:
+
+1. `python tools/build_proyecto.py` (solo en tu computadora: genera los notebooks resueltos en `notebooks_resueltos/proyecto/`).
+2. Abre `notebooks_resueltos/proyecto/P5_red_multicapa.ipynb` y ejecútalo entero (~1 min). Al final guarda `pesos.npz`.
+3. En una terminal, dentro de `notebooks_resueltos/proyecto/`: `python dibujar.py`. Dibuja un 3, un 7, un 0. Deja la ventana lista.
+
+> Si `tools/build_proyecto.py` dice que no encuentra `tools/proyecto_src`, te falta la carpeta con las fuentes (no está en GitHub porque tiene las soluciones). Cópiala desde tu computadora de trabajo.
 
 ---
 
-# PARTE B — Qué explicar en cada diapositiva
+# PARTE B — La clase paso a paso
 
-Duración sugerida: **2 horas**. Junto a cada título va el tiempo aproximado.
+## Demo (2 min)
+Abre `dibujar.py` en el proyector y **pide a un alumno que dibuje un número**. La red lo adivina. Di solo: *«Esto lo van a programar ustedes, en 7 clases. Empezamos ya.»* Nada de teoría todavía.
 
-## Diapositiva 1 — Portada (2 min)
-**Qué decir:** "Este es un curso introductorio. Vamos a entender cómo funcionan las redes neuronales **por dentro**: su teoría y cómo programarlas desde conceptos simples. Esto es la base para después estudiar aprendizaje profundo (*deep learning*) y hacer cosas más complejas."
+## Paso 1 · Instalar (40 min)
+Sigue la **Parte A** (Colab o instalación local). Quien termina primero ayuda a su compañero; quien se trabe más de 10 min sigue en **Colab** y lo arreglan después.
 
-## Diapositiva 2 — Agenda (2 min)
-Hoy vemos 4 temas, uno por cada video del curso:
-1. Presentación.
-2. Instalación de herramientas.
-3. Inteligencia artificial y redes neuronales.
-4. Aprendizaje automático.
+## Paso 2 · Abrir el proyecto (5 min)
+**Haz:** abrir `proyecto/P1_conocer_los_datos.ipynb`, elegir el kernel **nni**, ejecutar las dos primeras celdas (Shift + Enter).
+**Deben ver:** `X_train: (60000, 28, 28)`. Quien lo ve, terminó de instalar.
+Explica en 30 segundos la dinámica: las celdas con `...` son suyas; después de cada ejercicio hay una comprobación ✅/❌ con pista.
 
-## Diapositiva 3 — "Ya las usas todos los días" (10 min)
-**Actividad (5 min):** pregunta "¿Qué aplicación con inteligencia artificial usaron hoy?". Anota las respuestas en el pizarrón.
+## Paso 3 · Mirar los datos (15 min)
+**Haz:** ejecutar `mostrar(...)` y la celda que imprime la tabla de números; **Ejercicio 1** (`np.bincount`).
+**Deben ver:** ~6 000 ejemplos de cada dígito.
+**Reto mientras tanto:** *¿encuentras el 5 dentro de la tabla de números?*
 
-**Explica cada tarjeta:**
-- **Vehículos:** autos que ven la calle con cámaras y deciden cómo manejar.
-- **Lenguaje:** Alexa, Google, traductores y chatbots entienden y producen texto.
-- **Imagen:** los filtros de TikTok detectan tu cara y la modifican.
-- **Salud:** detectan enfermedades en radiografías.
-- **Videojuegos:** generan gráficos realistas más rápido. Calcular la luz real (*ray tracing*) es muy costoso.
-- **Refuerzo:** programas que aprenden a jugar jugando muchas veces.
-- **Generativa:** DALL·E y Stable Diffusion crean imágenes a partir de un texto. Hoy ya cuesta distinguir si una imagen la hizo una persona o una IA.
-- **Robótica:** robots que perciben y se mueven.
+## ⏸ Pausa: una imagen es una tabla de números (3 min)
+**Cuándo:** cuando la mayoría vio la tabla.
+**Di:** cada imagen son 28 × 28 = 784 números, 0 negro y 255 blanco. Para la red será **una fila de 784 números entre 0 y 1**. Y hay 60 000 imágenes para aprender y 10 000 para el examen: *si el examen trae las preguntas de la práctica, no sabes si el alumno entendió o memorizó*.
 
-**Mensaje clave:** las redes neuronales ya trabajan "por detrás" en muchos lados; por eso conviene saber cómo funcionan.
+## Paso 4 · Preparar los datos (10 min)
+**Haz:** Ejercicio 2: `reshape(60000, 784) / 255` (y lo mismo para la prueba).
+**Error típico:** `reshape(784)` sin decir cuántas imágenes son. La comprobación lo detecta.
 
-## Diapositiva 4 — "Dos formas de hacer los ejercicios" (5 min)
-- Los ejercicios son **notebooks** con instrucciones: solo hay que **rellenar partes del código**.
-- Usamos solo **Python y NumPy**, "a pie", a propósito. Así entendemos qué pasa por dentro, en lugar de llamar a una función mágica como `.fit()` que lo hace todo sin que veamos nada.
-- **Opción 1, Colab:** no se configura nada; funciona en el navegador.
-- **Opción 2, tu máquina:** más trabajo al inicio, pero es como se trabaja en proyectos reales y en equipo.
+## Descanso (10 min)
 
-## Diapositiva 5 — "Instalación paso a paso" (25 min)
-**Haz la instalación en vivo** siguiendo la **Parte A.3**, y que los alumnos la repitan.
+## ⏸ Pausa: reglas vs ejemplos (3 min)
+**Pregunta primero:** *¿cómo le explicarías a una computadora qué es un 7?* Deja que propongan reglas y muestra cómo fallan (7 con rayita, inclinado…).
+**Di:** en vez de reglas, **aprender de ejemplos**. Idea de hoy: promediar los 6 000 «tres» → el tres típico (plantilla). Muestra las plantillas en la diapositiva.
 
-Explica cada comando así:
+## Paso 5 · La IA de plantillas (30 min)
+**Haz:** Ejercicio 3 (`X[y_train == d].mean(axis=0)`), Ejercicio 4 (`predecir`: la plantilla más parecida con `argmin`), y el examen.
+**Deben ver:** `Precisión: 82.0%`.
+**Si se traban:** explica la máscara `y_train == d` (lista de Verdadero/Falso que filtra filas).
+**Al final:** miren juntos los errores. *¿Tú también los confundirías?*
 
-| Comando | En palabras |
-|---|---|
-| `conda create --name nni python=3` | "Crea una caja llamada nni con Python 3 dentro." |
-| `conda activate nni` | "Entra a la caja. Fíjense que ahora dice (nni)." |
-| `pip install jupyter numpy ...` | "Mete en la caja las herramientas que vamos a usar." |
-| `cd projects` | "Ve a mi carpeta de proyectos." |
-| `git clone <url>` | "Descarga una copia del repositorio del curso." |
-| `ls` | "Muéstrame qué archivos hay aquí." |
-| VS Code → Abrir carpeta | "Abro el proyecto en el editor y elijo el kernel nni." |
-
-Termina cuando todos vean la **Verificación final** del Paso 7. Quien no lo logre, que use Colab y lo resuelva después con la Parte C.
-
-## Diapositiva 6 — "¿Qué es la inteligencia artificial?" (8 min)
-- **No existe una definición única** aceptada por todos, ni un teorema que diga "esto sí es IA y esto no".
-- El libro de **Russell y Norvig** (*Inteligencia Artificial: un enfoque moderno*) agrupa las definiciones en dos enfoques:
-  1. **Imitar al humano:** construir máquinas que piensen como nosotros, duplicando lo que hace el cerebro. Problema: si copiamos perfectamente al humano, también copiamos sus errores.
-  2. **Actuar racionalmente:** que la máquina **perciba** su entorno, **razone** (procese) y **actúe** para resolver el problema, aunque no lo haga como el cerebro.
-- **Ejemplo:** una calculadora no piensa como humano, pero resuelve sumas perfectamente. Es "racional" para esa tarea.
-- **Lectura:** capítulo 1 de Russell y Norvig.
-
-## Diapositiva 7 — "El test de Turing" (10 min)
-**El problema:** como no hay definición de inteligencia, Alan Turing propuso una **prueba**.
-
-**Cómo funciona:**
-1. Una persona conversa por mensajes, como en un chat, con "alguien" que no ve.
-2. Del otro lado puede haber una persona o una máquina.
-3. Si la persona **no logra distinguir** si habla con una máquina, la máquina **pasa** el test y se considera inteligente.
-
-**¿Por qué es "operacional"?** Porque solo mide si pasa o no pasa; no le importa cómo funciona por dentro.
-
-**Qué necesita una máquina para pasarlo** (explica cada tarjeta en orden, como un flujo):
-1. **Lenguaje natural:** recibir y entender el mensaje.
-2. **Representación del conocimiento:** convertir el mensaje en algo que la máquina pueda manejar internamente.
-3. **Inferencia:** a partir de ese conocimiento, generar una respuesta.
-4. **Síntesis:** convertir la respuesta otra vez en lenguaje para el humano.
-5. **Aprendizaje:** adaptarse a cada usuario distinto.
-
-**Conexión con el curso:** con el aprendizaje profundo, las redes neuronales ya cubren todas esas partes:
-- extraen características a una representación interna llamada **espacio latente**;
-- hacen inferencia;
-- generan la salida con un **decodificador** (texto o imagen);
-- y sus parámetros internos (**pesos**) se ajustan a cada tarea.
-
-## Diapositiva 8 — "¿Qué tan lejos llegan las redes?" (8 min)
-Dibuja **tres ejes** en el pizarrón:
-
-| Eje | Significa | Redes neuronales |
-|---|---|---|
-| **Operacional** | Resolver la tarea: controlar, jugar, reconocer, generar | **Muy buenas**: reconocen personas, manejan autos, crean imágenes |
-| **Razonamiento** | Representar conocimiento, inferir como humano y, al extremo, tener conciencia | Limitadas, al menos por ahora |
-| **Explicabilidad** | Poder garantizar cuándo funcionan y cuándo no, y por qué | Limitadas: a veces fallan y no sabemos exactamente por qué |
-
-**Conclusión:** son herramientas muy efectivas para resolver problemas, pero no tienen conciencia ni son completamente explicables. Por eso en el curso nos interesa mucho **cómo entrenarlas** bien.
-
-## Diapositiva 9 — "Dónde encajan las redes neuronales" (5 min)
-Dibuja **círculos uno dentro de otro**:
-- **Inteligencia artificial** (el más grande): todo intento de que las máquinas hagan tareas inteligentes.
-  - **Aprendizaje automático:** la parte de la IA que **aprende de ejemplos**.
-    - **Redes neuronales:** un tipo de aprendizaje automático formado por muchas unidades simples conectadas.
-      - **Aprendizaje profundo:** redes con **muchas capas**; cada capa extrae rasgos más abstractos (bordes → formas → objetos).
-
-## Diapositiva 10 — "El aprendizaje automático" (8 min)
-**Definición (Arthur Samuel, 1959):** "dar a las computadoras la capacidad de aprender sin ser programadas explícitamente".
-
-**Ejemplo del ajedrez:**
-- Queremos una computadora que gane al ajedrez.
-- Un programador **no puede** escribir qué hacer en cada posición posible del tablero: hay muchísimas combinaciones, sería intratable.
-- Solución: que la computadora **aprenda de la experiencia**, por ejemplo jugando muchas partidas.
-
-**Definición en términos de aprendizaje:** un agente aprende si, **después de hacer observaciones (experiencia), mejora su desempeño** en futuras instancias de la tarea.
-
-Tres ingredientes:
-1. **Tarea:** ganar al ajedrez.
-2. **Experiencia:** partidas jugadas o datos.
-3. **Mejora del desempeño:** gana más seguido.
-
-## Diapositiva 11 — "Tarea 1: Regresión" (10 min)
-**Qué es:** encontrar una **función** que relacione una **entrada** con una **salida numérica continua**. Ejemplo: entrada = metros cuadrados de una casa; salida = precio.
-
-**Explica la gráfica:**
-- **Puntos naranjas = datos** (la "experiencia" o *dataset*). Pueden venir de estudios, mediciones o simulaciones.
-- **Línea azul = la función real.** En la vida real **no la conocemos**; solo tenemos los puntos.
-- **Líneas grises punteadas = hipótesis:** funciones candidatas que proponemos para explicar los puntos.
-
-Conceptos:
-- Una hipótesis es **consistente** si explica bien los datos que tenemos.
-- Pero eso no basta: queremos que también funcione con **datos futuros** que vengan del mismo fenómeno. Eso se llama **generalización**.
-
-**Pregunta a la clase:** "¿Una curva que pase exactamente por todos los puntos haciendo zigzag es buena?" → No necesariamente. Puede explicar estos datos y fallar con los nuevos.
-
-## Diapositiva 12 — "Otras tareas" (10 min)
-1. **Clasificación:** asignar una **etiqueta** de una lista predefinida {l₁, …, lₙ}. Ejemplo: le das una foto y responde "perro" o "gato" (dataset *Dogs vs Cats* de Kaggle). La diferencia con la regresión es que la salida es una **categoría**, no un número continuo.
-2. **Agrupamiento (clustering):** **no hay etiquetas**. El algoritmo agrupa solo, por parecido. Ejemplo: con medidas como qué tan puntiagudas son las orejas o qué tan largos los bigotes, encuentra dos grupos (que resultan ser perros y gatos), cada uno con su **media** (centro) y su **varianza** (qué tan dispersos están).
-3. **Reducción de dimensionalidad:** describir algo con **menos características**. Ejemplo: en 2 ejes, perros y gatos están revueltos y ninguna recta los separa. Si los proyectamos a 1 solo eje nuevo, basta un **umbral** (un punto) para separarlos. Simplifica el problema y ayuda a explicarlo.
-4. **Modelado generativo:** aprender la **distribución** de los datos para **crear ejemplos nuevos**. Ejemplo: aprender "cómo es un rostro" y generar rostros que no existen. Se usa también para arte e imágenes.
-
-## Diapositiva 13 — "Tipos de aprendizaje" (10 min)
-1. **Supervisado:**
-   - La experiencia es una lista de **pares (x, y)**: x = el ejemplo (una figura), y = su etiqueta (cono, cubo, esfera).
-   - El algoritmo busca la función que lleva de x a y. Ese proceso se llama **entrenamiento**.
-   - Luego debe acertar con ejemplos **nuevos** que nunca vio: **generalización**. Ejemplo: un auto autónomo debe manejar en calles donde nunca se entrenó.
-2. **No supervisado:**
-   - Hay ejemplos **sin etiquetas**.
-   - El algoritmo descubre qué los distingue: los cubos tienen 6 caras; las esferas no tienen vértices aunque cambie su tamaño o color. Con eso los agrupa.
-   - Un ejemplo nuevo cae en su grupo correspondiente.
-3. **Por refuerzo:**
-   - La experiencia **no está disponible** de antemano: se consigue **interactuando**.
-   - Se detalla en la siguiente diapositiva.
-
-## Diapositiva 14 — "Aprendizaje por refuerzo" (8 min)
-Dibuja el ciclo **Agente ⇄ Ambiente**:
-1. El **agente** (el programa) hace una **acción**, por ejemplo mover una pieza de ajedrez.
-2. La acción cambia el **estado** del **ambiente** (el tablero).
-3. El agente **observa** el nuevo estado y recibe una **recompensa**.
-4. Se repite muchas veces.
-
-Conceptos:
-- **Recompensa a corto plazo:** comer una pieza.
-- **Recompensa a largo plazo (horizonte):** ganar la partida. Es lo que realmente importa.
-- **Objetivo:** maximizar la recompensa total.
-- Al inicio el agente pierde mucho. Con la experiencia ajusta su regla de "en este estado, haz esta acción" y termina ganando.
-
-**Cierre del tema:** las redes neuronales sirven para muchas de estas tareas: regresión, clasificación, reducción de dimensionalidad y generación. Algunas incluso aprenden su propia representación del conocimiento.
-
-## Diapositiva 15 — Quiz (10 min)
-Que respondan en papel durante 5 minutos y luego revisa en voz alta.
-
-| # | Pregunta | Respuesta |
-|---|---|---|
-| 1 | ¿Por qué el test de Turing es una definición operacional? | Solo mide si pasa o no; no importa cómo funciona por dentro. |
-| 2 | ¿En cuál de los tres ejes destacan las redes? | El operacional: resolver problemas. |
-| 3 | ¿Qué es generalizar? | Funcionar bien con ejemplos que nunca vio. |
-| 4 | ¿Diferencia entre clasificación y agrupamiento? | Clasificación tiene etiquetas predefinidas; agrupamiento no. |
-| 5 | ¿Qué maximiza un agente de refuerzo? | La recompensa acumulada (a largo plazo). |
-
-## Diapositiva 16 — "Para la próxima clase" (2 min)
-1. Tener el ambiente instalado y el repositorio clonado (Parte A).
-2. Leer **Russell y Norvig:** capítulo 1, y las secciones 18.1 y 18.2 (*Learning from examples*).
-3. Leer **Goodfellow, Bengio y Courville, *Deep Learning*:** sección 5.1 (*Learning algorithms*).
-
-La próxima clase empezaremos con la primera neurona artificial: el modelo de **McCulloch y Pitts**.
+## Resultado y cierre (15 min)
+- Diapositiva **82 %**: al azar sería 10 %; pero 1 de cada 5 mal es mucho. Y **las plantillas nunca cambian**: no aprenden de sus errores.
+- **Mapa del proyecto:** así avanzará el curso.
+- **Tarea:** terminar `P1`. Desafío: ¿y si usas el producto punto (`plantillas @ x`) con `argmax`?
+- **Próxima clase:** una neurona que corrige sus pesos cuando se equivoca.
 
 ---
 
@@ -486,15 +384,20 @@ La próxima clase empezaremos con la primera neurona artificial: el modelo de **
 |---|---|---|
 | `conda` no se reconoce como comando | Abriste PowerShell o CMD normal | Abre **Anaconda PowerShell Prompt** desde el menú Inicio |
 | Sigue diciendo `(base)` | No activaste el ambiente | `conda activate nni` |
-| `EnvironmentNameNotFound: nni` | El ambiente no se creó | Repite el Paso 2 y revisa con `conda env list` |
+| `EnvironmentNameNotFound: nni` | El ambiente no se creó | Repite el Paso 4 y revisa con `conda env list` |
+| `git` no se reconoce | Git no instalado, o terminal abierta antes de instalarlo | Instala Git (Paso 2) y **abre una terminal nueva** |
+| `mkdir` dice que la carpeta ya existe | Ya la habías creado | No es un error grave; sigue con `cd projects` |
+| `destination path ... already exists` | Ya clonaste antes | No pasa nada; entra con `cd curso-redes-neuronales` y actualiza con `git pull` |
+| `Could not open requirements file` | No estás dentro de `curso-redes-neuronales` | `cd ~\projects\curso-redes-neuronales` y repite el Paso 6 |
 | `ModuleNotFoundError: No module named 'numpy'` en VS Code | El kernel elegido no es `nni` | Select Kernel → Python Environments → **nni** |
 | VS Code no muestra `nni` en la lista de kernels | Falta `ipykernel` o la extensión | Con `(nni)` activo: `pip install ipykernel`; instala las extensiones Python y Jupyter; reinicia VS Code |
-| `git` no se reconoce | Git no instalado o terminal abierta antes de instalarlo | Instala Git (Paso 5) y abre una **nueva** ventana de Git Bash |
-| `destination path ... already exists` | Ya clonaste antes | No pasa nada; entra con `cd curso-redes-neuronales` |
-| `ModuleNotFoundError: No module named 'nni'` | El notebook no se abrió desde la carpeta del repositorio | Abre en VS Code la carpeta `notebooks` completa, no el archivo suelto |
+| `ModuleNotFoundError: No module named 'nni'` | El notebook no se abrió desde el repositorio | Abre en VS Code la carpeta `curso-redes-neuronales` completa, no el archivo suelto |
 | `pip` falla con error de red o SSL | Internet o proxy de la institución | Prueba otra red, o usa Colab |
 | La instalación de Anaconda falla por permisos | Sin permisos de administrador | Usa Colab (Camino 1) |
 | Las tildes se ven como `�` en la terminal | Codificación de Windows | Ejecuta `chcp 65001` antes; es solo visual |
+| `ModuleNotFoundError: No module named 'digitos'` | El notebook no se abrió desde la carpeta `proyecto/` | Abre en VS Code la carpeta `curso-redes-neuronales` completa y el notebook desde `proyecto/`; en Colab la primera celda lo descarga sola |
+| La descarga de MNIST falla | Sin internet o proxy | Copia `proyecto/datos/mnist.npz` desde otra computadora (con USB) |
+| `NameError` en una celda | Se saltaron una celda anterior | **Run All** (Ejecutar todo) desde arriba |
 | Colab perdió mis cambios | No se guardó una copia | **Archivo → Guardar una copia en Drive** |
 
 **Si nada funciona:** usa Colab en clase y revisa la instalación después, con calma, repitiendo la Parte A paso por paso.
