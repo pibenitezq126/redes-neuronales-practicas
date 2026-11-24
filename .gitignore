@@ -7,3 +7,4 @@ notebooks/.ipynb_checkpoints/
 notebooks/Untitled*.ipynb
 __pycache__/
 *.pyc
+proyecto/datos/
